@@ -1,16 +1,17 @@
 import express, { json } from "express"
 import { connectDb } from "./config/db.js"
 import { registerUser } from "./controllers/authController.js"
-
+import "dotenv/config"
 const app = express()
 
+const port=process.env.PORT
 // middleware
 app.use(express.json())
 
 app.post("/user/register",registerUser)
 
-app.listen(4000,()=>{
-    console.log("Server is running on Port 4000")
+app.listen(port,()=>{
+    console.log(`Server running on ${port}`)
 })
 
 connectDb()
