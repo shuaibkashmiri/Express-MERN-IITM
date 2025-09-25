@@ -32,6 +32,8 @@ export const registerUser=async(req,res)=>{
     }
 }
 
+
+
 export const login=async(req,res)=>{
     try {
         const{email,password}=req.body;
@@ -55,3 +57,29 @@ export const login=async(req,res)=>{
     }
 }
 
+
+export const getAllUsers=async(req,res)=>{
+    try {
+        const users=await User.find()
+        if(!users){
+            return res.status(404).json({message:"No Users"})
+        }
+        return res.status(200).json({message:"Users Fetched",users})
+        
+    } catch (error) {
+      console.log(error)  
+    }
+}
+
+export const getSingleUser=async(req,res)=>{
+    try {
+        const {userid}=req.params
+        const getUser=await User.findById(userid)
+        if(!getUser){
+            return res.status(404).json({message:"User Not Found"})
+        }
+        return res.status(200).json({message:"User Found",getUser})
+    } catch (error) {
+        console.log(error)
+    }
+}
