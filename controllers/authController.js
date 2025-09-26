@@ -1,6 +1,9 @@
 
 import { User } from "../models/userModel.js";
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+
+const secretCode=process.env.JWT_SECRET
 
 
 // basic Create Crud Operation
@@ -50,12 +53,18 @@ export const login=async(req,res)=>{
         if(!checkPass){
             return res.status(400).json({message:"incorrect password"})
         }
+
         
-        return res.status(200).json({message:"User Logged in Successfully" ,user:existingUser})
+        const token = jwt.sign({payload:existingUser._id},secretCode)
+        
+
+
+        return res.status(200).json({message:"User Logged in Successfully" ,token,user:existingUser})
     } catch (error) {
         console.log(error)
     }
 }
+
 
 
 export const getAllUsers=async(req,res)=>{
@@ -73,7 +82,7 @@ export const getAllUsers=async(req,res)=>{
 
 export const getSingleUser=async(req,res)=>{
     try {
-        const {userid}=req.params
+        const userid=req.user
         const getUser=await User.findById(userid)
         if(!getUser){
             return res.status(404).json({message:"User Not Found"})
