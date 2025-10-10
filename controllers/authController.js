@@ -12,12 +12,12 @@ export const registerUser=async(req,res)=>{
         const {name,email,password}=req.body
 
     if(name===""||email===""||password===""){
-        return res.status(400).json({message:"All Credentials Required"})
+        return res.json({message:"All Credentials Required"})
     }
     const existingUser=await User.findOne({email})
 
     if(existingUser){
-        return res.status(400).json({message :"user already registered"})
+        return res.json({message :"user already registered"})
     }
 
     const hashPass=await bcrypt.hash(password,10)
