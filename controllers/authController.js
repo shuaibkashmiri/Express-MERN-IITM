@@ -1,4 +1,3 @@
-
 import { User } from "../models/userModel.js";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
@@ -41,17 +40,17 @@ export const login=async(req,res)=>{
     try {
         const{email,password}=req.body;
         if(!email||!password){
-            return res.status(400).json({message:"Email and Password Required"})
+            return res.json({message:"Email and Password Required"})
         }
         const existingUser=await User.findOne({email})
         console.log(existingUser)
         if(!existingUser){
-            return res.status(404).json({message:"No User Found"})
+            return res.json({message:"No User Found"})
         }
         const checkPass=await bcrypt.compare(password,existingUser.password)
 
         if(!checkPass){
-            return res.status(400).json({message:"incorrect password"})
+            return res.json({message:"incorrect password"})
         }
 
         
