@@ -6,5 +6,5 @@ import { protect } from "../middlewares/auth.js"
  router.post("/register",registerUser)
 router.post("/login",login)
 router.get("/getall",getAllUsers)
-router.get("/getsingle",protect,getSingleUser)
+router.get("/userdetails",protect,getSingleUser)
  export default router
