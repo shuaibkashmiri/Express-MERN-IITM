@@ -1,10 +1,11 @@
 import express from "express"
 import { getAllUsers, getSingleUser, login, registerUser } from "../controllers/authController.js"
 import { protect } from "../middlewares/auth.js"
- const router =express.Router()
+import upload from "../middlewares/uploadMiddleware.js"
+const router = express.Router()
 
- router.post("/register",registerUser)
-router.post("/login",login)
-router.get("/getall",getAllUsers)
-router.get("/userdetails",protect,getSingleUser)
- export default router
+router.post("/register",upload.single("profilePicture"), registerUser)
+router.post("/login", login)
+router.get("/getall", getAllUsers)
+router.get("/userdetails", protect, getSingleUser)
+export default router
