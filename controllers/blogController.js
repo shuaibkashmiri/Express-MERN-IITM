@@ -1,5 +1,6 @@
 import { Blog } from "../models/blogModel.js";
 import cloudinary from "../config/cloudinary.js";
+import fs from "fs/promises"
 
 export const createBlog=async(req,res)=>{
     try {
@@ -9,12 +10,19 @@ export const createBlog=async(req,res)=>{
         if(!title||!description){
             return res.json({message:"Äll fields Required"})
         }
-     const b64 = Buffer.from(req.file.buffer).toString("base64");
-                // console.log(b64)
-                const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
-                // console.log(dataURI)
-                const result = await cloudinary.uploader.upload(dataURI);
+     
+        if (req.file && process.env.CLOUDINARY_CLOUD_NAME) {
+            try {
+                // Upload to Cloudinary
+                const result = await cloudinary.uploader.upload(req.file.path);
                 photoUrl = result.secure_url;
+
+                // Remove temporary local file
+                await fs.unlink(req.file.path);
+            } catch (err) {
+                console.log(err);
+            }
+        }
 
                 const newBlog = await Blog.create({
                     title,description,photoUrl

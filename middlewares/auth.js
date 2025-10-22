@@ -1,26 +1,35 @@
 import jwt from "jsonwebtoken"
 const secretCode= process.env.JWT_SECRET
 
-export const protect=async (req,res,next)=>{
+export const protect = async (req, res, next) => {
     try {
-        const token =req.headers.authorization || req.headers.authorization?.split(" ")[1]
-        console.log(token)
-        // console.log(req.headers.authorization.split(" "))
-        // console.log(token)
-        if(!token){
-            return res.status(404).json({message:"token Required"})
+        let token;
+
+        if (req.headers.authorization) {
+            const authHeader = req.headers.authorization.trim();
+
+            // Check if it starts with "Bearer "
+            if (authHeader.startsWith("Bearer ")) {
+                token = authHeader.split(" ")[1];
+            } else {
+                token = authHeader; // direct token
+            }
         }
 
-        const decode= jwt.verify(token,secretCode)
-        if(!decode){
-            return res.status(400).json({message:"Unauthorized Access"})
+        if (!token) {
+            return res.status(401).json({ message: "Token required" });
         }
-         console.log(decode)
-        req.user=decode.payload
-        next()
 
-        console.log(token)
+        const decoded = jwt.verify(token, secretCode);
+
+        if (!decoded) {
+            return res.status(401).json({ message: "Unauthorized access" });
+        }
+
+        req.user = decoded.payload || decoded; // support both payload structure or direct
+        next();
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        res.status(401).json({ message: "Invalid token" });
     }
-}
+};

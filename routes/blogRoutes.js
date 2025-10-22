@@ -5,6 +5,6 @@ import { protect } from '../middlewares/auth.js'
 
 const router =express.Router()
 
-router.post("/create",upload.single("image"),createBlog)
+router.post("/create",protect,upload.single("image"),createBlog)
 
 export default router

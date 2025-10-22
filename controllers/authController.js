@@ -2,73 +2,107 @@ import { User } from "../models/userModel.js";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import cloudinary from "../config/cloudinary.js"
+import fs from "fs/promises"
 
 const secretCode=process.env.JWT_SECRET
 
 
-// basic Create Crud Operation
+// Register Controller
+// export const registerUser = async (req, res) => {
+//     try {
+//         console.log('Request Content-Type:', req.get('Content-Type'));
+//         console.log('req.body:', req.body);
+//         console.log('req.file:', req.file);
+//         console.log('req.files:', req.files);
+        
+//         const { name, email, password } = req.body;
+
+//         if (name === "" || email === "" || password === "") {
+//             return res.json({ message: "All Credentials Required" });
+//         }
+//         const existingUser = await User.findOne({ email });
+
+//         if (existingUser) {
+//             return res.json({ message: "user already registered" });
+//         }
+
+//         const hashPass = await bcrypt.hash(password, 10);
+
+//         // Handle profile picture upload if present
+//         let profilePicture = null;
+//         if (req.file && process.env.CLOUDINARY_CLOUD_NAME) {
+//             try {
+//                 // Convert buffer to base64 for cloudinary upload
+//                 const b64 = Buffer.from(req.file.buffer).toString("base64");
+//                 // console.log(b64)
+//                 const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+//                 // console.log(dataURI)
+//                 const result = await cloudinary.uploader.upload(dataURI);
+//                 profilePicture = result.secure_url;
+               
+//             } catch (error) {
+//             console.log(error)
+//             }
+//         } 
+
+//         const newUser = await User.create({
+//             name,
+//             email,
+//             password: hashPass,
+//             profilePicture
+//         });
+
+//         if (newUser) {
+//             return res.status(201).json({
+//                 message: "User Created Successfully",
+//                 user: {
+//                     name: newUser.name,
+//                     email: newUser.email,
+//                     profilePicture: newUser.profilePicture
+//                 }
+//             });
+//         }
+//     } catch (error) {
+//         console.error('Error in registerUser:', error);
+//         return res.status(500).json({ message: "Internal Server Error" });
+//     }
+// };
+
+
 export const registerUser = async (req, res) => {
     try {
-        console.log('Request Content-Type:', req.get('Content-Type'));
-        console.log('req.body:', req.body);
-        console.log('req.file:', req.file);
-        console.log('req.files:', req.files);
-        
         const { name, email, password } = req.body;
+        if (!name || !email || !password) return res.json({ message: "All Credentials Required" });
 
-        if (name === "" || email === "" || password === "") {
-            return res.json({ message: "All Credentials Required" });
-        }
         const existingUser = await User.findOne({ email });
-
-        if (existingUser) {
-            return res.json({ message: "user already registered" });
-        }
+        if (existingUser) return res.json({ message: "User already registered" });
 
         const hashPass = await bcrypt.hash(password, 10);
 
-        // Handle profile picture upload if present
         let profilePicture = null;
+
         if (req.file && process.env.CLOUDINARY_CLOUD_NAME) {
             try {
-                // Convert buffer to base64 for cloudinary upload
-                const b64 = Buffer.from(req.file.buffer).toString("base64");
-                // console.log(b64)
-                const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
-                // console.log(dataURI)
-                const result = await cloudinary.uploader.upload(dataURI);
+                // Upload to Cloudinary
+                const result = await cloudinary.uploader.upload(req.file.path);
                 profilePicture = result.secure_url;
-               
-            } catch (error) {
-            console.log(error)
+
+                // Remove temporary local file
+                await fs.unlink(req.file.path);
+            } catch (err) {
+                console.log(err);
             }
-        } 
-
-        const newUser = await User.create({
-            name,
-            email,
-            password: hashPass,
-            profilePicture
-        });
-
-        if (newUser) {
-            return res.status(201).json({
-                message: "User Created Successfully",
-                user: {
-                    name: newUser.name,
-                    email: newUser.email,
-                    profilePicture: newUser.profilePicture
-                }
-            });
         }
-    } catch (error) {
-        console.error('Error in registerUser:', error);
-        return res.status(500).json({ message: "Internal Server Error" });
+
+        const newUser = new User({ name, email, password: hashPass, profilePicture });
+        await newUser.save();
+
+        res.json({ message: "User registered successfully" });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Server error" });
     }
 };
-
-
-
 
 
 export const login=async(req,res)=>{
