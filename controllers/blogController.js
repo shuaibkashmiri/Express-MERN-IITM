@@ -36,3 +36,15 @@ return res.status(201).json({message:"Blog Posted Successfully",newBlog})
         console.log(error)
     }
 }
+
+export const getAllBlogs=async(req,res)=>{
+    try {
+        const blogs=await Blog.find()
+        if(!blogs){
+            return res.status(404).json({message:"no blogs"})
+        }
+        res.status(200).json({blogs})
+    } catch (error) {
+        console.log(error)
+    }
+}
