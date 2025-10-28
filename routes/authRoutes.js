@@ -8,4 +8,11 @@ router.post("/register",upload.single("profilePicture"), registerUser)
 router.post("/login", login)
 router.get("/getall", getAllUsers)
 router.get("/userdetails", protect, getSingleUser)
+
+
+// frontend auth
+
+router.get("/user-auth",protect,(req,res)=>{
+    res.status(200).json({success:true})
+})
 export default router

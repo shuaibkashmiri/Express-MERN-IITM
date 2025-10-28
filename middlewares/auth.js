@@ -17,7 +17,7 @@ export const protect = async (req, res, next) => {
         }
 
         if (!token) {
-            return res.status(401).json({ message: "Token required" });
+            return res.json({ message: "UnAuthorized Access" });
         }
 
         const decoded = jwt.verify(token, secretCode);
