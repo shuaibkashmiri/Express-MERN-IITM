@@ -48,3 +48,24 @@ export const getAllBlogs=async(req,res)=>{
         console.log(error)
     }
 }
+
+export const deleteBlog=async(req,res)=>{
+
+    try {
+        const {blogId}=req.params
+        // const getBlog=await Blog.findById(blogId)
+        // if (!getBlog){
+        //     return res.json({message:"no blog found"})         
+        // }
+        const deleteBlog=await Blog.findByIdAndDelete(blogId)
+        if(!deleteBlog){
+            return res.json({message:"SomeThing Went Wrong!"})
+        }
+        return res.status(200).json({message:"Blog Deleted Successfully"})
+    
+
+        
+    } catch (error) {
+        console.log(error)
+    }
+}
