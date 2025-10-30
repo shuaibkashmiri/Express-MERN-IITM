@@ -1,6 +1,8 @@
 import { Blog } from "../models/blogModel.js";
 import cloudinary from "../config/cloudinary.js";
+import {User} from '../models/userModel.js'
 import fs from "fs/promises"
+import { get } from "http";
 
 export const createBlog=async(req,res)=>{
     try {
@@ -63,6 +65,47 @@ export const deleteBlog=async(req,res)=>{
         }
         return res.status(200).json({message:"Blog Deleted Successfully"})
     
+
+        
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+export const addLike=async(req,res)=>{
+    try {
+        const {blogId,userId}=req.params
+        // const userId=req.user
+    
+        const getUser=await  User.findById(userId)
+
+        if(!getUser){
+            return res.json({message:"no user found"})
+        }
+
+        const getBlog=await Blog.findById(blogId)
+        // console.log(getBlog)
+        console.log(getBlog.likes)
+
+        if(!blogId){
+            return res.json({message:"no blog found"})
+        }
+        if(getBlog.likes.includes(userId)){
+            getBlog.likes=getBlog.likes.filter(id=>id.toString() !== userId)
+            await getBlog.save()
+            res.json({message:"Like Removed"})
+        } else{
+        getBlog.likes.push(userId)
+       await getBlog.save()
+        return res.status(200).json({message:"Like Added"})
+        }
+       
+       
+      
+
+
+
 
         
     } catch (error) {
