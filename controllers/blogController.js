@@ -75,11 +75,11 @@ export const deleteBlog=async(req,res)=>{
 
 export const addLike=async(req,res)=>{
     try {
-        const {blogId,userId}=req.params
+        const {blogId}=req.params
+        const userId=req.user
         // const userId=req.user
     
         const getUser=await  User.findById(userId)
-
         if(!getUser){
             return res.json({message:"no user found"})
         }

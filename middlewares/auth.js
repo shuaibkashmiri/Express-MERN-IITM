@@ -15,6 +15,7 @@ export const protect = async (req, res, next) => {
                 token = authHeader; // direct token
             }
         }
+        console.log(token)
 
         if (!token) {
             return res.json({ message: "UnAuthorized Access" });
